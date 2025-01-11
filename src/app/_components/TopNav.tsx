@@ -60,7 +60,7 @@ export default function TopNav() {
           <div className="relative">
             <button onClick={toggleDropdown} className="flex items-center">
               <img
-                src={session.user.image || "/default-avatar.png"}
+                src={session.user.image ?? "/default-avatar.png"}
                 alt="User Profile"
                 className="h-8 w-8 rounded-full"
               />
