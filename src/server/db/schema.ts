@@ -2,6 +2,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   index,
   integer,
+  pgEnum,
   pgTableCreator,
   primaryKey,
   text,
@@ -52,10 +53,6 @@ export const users = createTable("user", {
   }).default(sql`CURRENT_TIMESTAMP`),
   image: varchar("image", { length: 255 }),
 });
-
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts),
-}));
 
 export const accounts = createTable(
   "account",
@@ -127,3 +124,91 @@ export const verificationTokens = createTable(
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
   }),
 );
+
+export const bases = createTable("base", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  name: varchar("name", { length: 255 }).notNull(),
+  userId: varchar("user_id", { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+});
+
+export const tables = createTable("table", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  name: varchar("name", { length: 255 }).notNull(),
+  baseId: integer("base_id")
+    .notNull()
+    .references(() => bases.id),
+});
+
+export const columnsType = pgEnum("columns", ["Number", "Text"]);
+
+export const columns = createTable("column", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  name: varchar("name", { length: 255 }).notNull(),
+  tableId: integer("table_id")
+    .notNull()
+    .references(() => tables.id),
+  columnIndex: integer("column_index").notNull(),
+  type: columnsType("type").notNull(),
+});
+
+
+export const rows = createTable("row", {
+  id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+  tableId: integer("table_id")
+    .notNull()
+    .references(() => tables.id),
+  rowIndex: integer("row_index").notNull(),
+});
+
+export const cells = createTable(
+  "cell",
+  {
+    id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
+    data: text("data"),
+    rowId: integer("row_id")
+      .notNull()
+      .references(() => rows.id),
+    columnId: integer("column_id")
+      .notNull()
+      .references(() => columns.id),
+  },
+  (cell) => ({
+    uniqueRowColumn: primaryKey({ columns: [cell.rowId, cell.columnId] }),
+  })
+);
+
+export const usersRelations = relations(users, ({ many }) => ({
+  accounts: many(accounts),
+  bases: many(bases),
+}));
+
+export const basesRelations = relations(bases, ({ many, one }) => ({
+  tables: many(tables),
+  user: one(users, { fields: [bases.userId], references: [users.id] }),
+}));
+
+export const tablesRelations = relations(tables, ({ many, one }) => ({
+  columns: many(columns),
+  rows: many(rows),
+  base: one(bases, { fields: [tables.baseId], references: [bases.id] }),
+}));
+
+export const columnsRelations = relations(columns, ({ many, one }) => ({
+  cells: many(cells),
+  table: one(tables, { fields: [columns.tableId], references: [tables.id] }),
+}));
+
+export const rowsRelations = relations(rows, ({ many, one }) => ({
+  cells: many(cells),
+  table: one(tables, { fields: [rows.tableId], references: [tables.id] }),
+}));
+
+export const cellsRelations = relations(cells, ({ one }) => ({
+  row: one(rows, { fields: [cells.rowId], references: [rows.id] }),
+  column: one(columns, { fields: [cells.columnId], references: [columns.id] }),
+}));
