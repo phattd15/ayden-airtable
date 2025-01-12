@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { FiMenu, FiBell, FiHelpCircle, FiUser, FiSearch } from "react-icons/fi";
+import { useState } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { FiMenu, FiBell, FiHelpCircle, FiUser, FiSearch } from 'react-icons/fi';
 
 export default function TopNav() {
   const { data: session } = useSession();
@@ -20,7 +20,7 @@ export default function TopNav() {
   };
 
   const handleLogout = async () => {
-    router.push("/api/auth/signout");
+    router.push('/api/auth/signout');
   };
 
   return (
@@ -60,7 +60,7 @@ export default function TopNav() {
           <div className="relative">
             <button onClick={toggleDropdown} className="flex items-center">
               <img
-                src={session.user.image ?? "/default-avatar.png"}
+                src={session.user.image ?? '/default-avatar.png'}
                 alt="User Profile"
                 className="h-8 w-8 rounded-full"
               />
