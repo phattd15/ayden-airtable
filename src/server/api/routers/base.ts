@@ -8,11 +8,13 @@ export const baseRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({ name: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(bases).values({
+      const [createdBase] = await ctx.db.insert(bases).values({
         name: input.name,
         userId: ctx.session.user.id,
         createdAt: new Date(),
-      });
+      }).returning();
+
+      return createdBase;
     }),
 
   update: protectedProcedure
@@ -23,7 +25,7 @@ export const baseRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db
+      return await ctx.db
         .update(bases)
         .set({ name: input.name })
         .where(eq(bases.id, input.id));

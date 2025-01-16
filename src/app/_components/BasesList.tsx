@@ -18,28 +18,30 @@ const BasesList = () => {
   }
 
   return (
-    <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+    <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
       {/* Loop through the bases and render a card for each one */}
       {data?.map((base) => (
         <div
           key={base.id}
           className="rounded-lg border border-gray-300 bg-white p-2 shadow-sm transition-shadow duration-300 hover:shadow-lg"
         >
-          <div
-            role="button"
-            className="height-full rounded-big colors-background-default pointer focus-visible shadow-elevation-low shadow-elevation-medium-hover p-2"
-            aria-label={`Create a base with ${base.name}`}
-          >
-            <div className="flex">
-              {/* You can choose an icon based on your preference */}
-              <PiTable className="mr-2 text-2xl text-blue-900" />
-              <h2 className="line-height-3 font-weight-stronger ml-2 text-sm font-semibold text-gray-900">
-                {base.name}
-              </h2>
+          <div className="h-30 rounded-md p-2 bg-white min-w-100">
+            <div className="flex items-center">
+              {/* Fixed-size "Un" square */}
+              <div className="flex h-16 w-16 mr-4 min-h-16 min-w-16 justify-center items-center bg-teal-500 text-white text-2xl rounded-lg">
+                Un
+              </div>
+              <div>
+                <div className="flex">
+                  <h2 className="line-height-3 font-weight-stronger text-sm font-semibold text-gray-900">
+                    {base.name}
+                  </h2>
+                </div>
+                <p className="line-height-4 mt-2 text-sm text-gray-500">
+                  This is a description of the base.
+                </p>
+              </div>
             </div>
-            <p className="line-height-4 mt-2 text-sm text-gray-500">
-              Create a new blank base with custom tables, fields, and views.
-            </p>
           </div>
         </div>
       ))}
